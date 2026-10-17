@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensei Neko's Japanisch Lern-App 🌸</title>
+    <style>
+        :root {
+            --bg-color: #fff0f5;
+            --card-bg: #ffffff;
+            --primary: #ff69b4;
+            --primary-hover: #ff1493;
+            --secondary: #ba55d3;
+            --accent: #ffb6c1;
+            --text-color: #4a4a4a;
+            --border-radius: 20px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 12px 30px rgba(255, 105, 180, 0.2);
+            box-sizing: border-box;
+            border: 4px dashed var(--accent);
+            position: relative;
+        }
+
+        .sensei-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #fff5f8;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--accent);
+        }
+
+        .sensei-avatar {
+            font-size: 2.8rem;
+            background: white;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            line-height: 1;
+        }
+
+        .sensei-speech {
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #ffe4e1;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin: 10px 0 20px 0;
+            font-size: 1.8rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 45px;
+            padding: 8px 2px;
+            border: none;
+            background: #ffe4e1;
+            color: var(--secondary);
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.65rem;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #ffd1dc;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            background: #fffafa;
+        }
+
+        button.submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-box select {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
+        .mode-toggle-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 250px;
+            margin-bottom: 15px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            border-radius: var(--border-radius);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        .flashcard.no-transition {
+            transition: none !important;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .card-front {
+            background: #fff0f5;
+            color: var(--primary);
+            border: 3px dashed var(--primary);
+        }
+
+        .card-back {
+            background: var(--secondary);
+            color: white;
+            transform: rotateY(180deg);
+            transition: background 0.3s;
+        }
+
+        .card-back.error-back {
+            background: #ff6b6b !important;
+        }
+
+        .card-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .card-meaning {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        ruby {
+            ruby-align: center;
+            ruby-position: over;
+        }
+        rt {
+            font-size: 0.65em;
+            color: #d63384;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .card-back rt { color: #ffeb3b; }
+        .mc-btn rt { font-size: 0.65em; color: #ff1493; }
+
+        .card-badge {
+            background: rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .card-hint {
+            font-size: 1.05rem;
+            background: rgba(0,0,0,0.15);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            max-width: 95%;
+            white-space: pre-line;
+        }
+
+        .card-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .card-input-area input {
+            flex: 1;
+            text-align: center;
+        }
+
+        .quiz-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .quiz-controls button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .btn-wrong { background: #ff7675; }
+        .btn-correct { background: #55efc4; color: #2d3436 !important; }
+
+        .challenge-box, .kana-box, .tense-box, .sentence-box, .grammar-lab-box {
+            background: #fff5f8;
+            border: 2px solid var(--accent);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .challenge-task {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .mc-btn {
+            background: white;
+            border: 2px solid var(--accent);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mc-btn:hover {
+            background: #ffe4e1;
+            border-color: var(--primary);
+        }
+        .mc-btn.correct {
+            background: #55efc4 !important;
+            color: #2d3436 !important;
+            border-color: #2ecc71 !important;
+        }
+        .mc-btn.wrong {
+            background: #ff7675 !important;
+            color: white !important;
+            border-color: #e74c3c !important;
+        }
+
+        .vocab-list {
+            max-height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .vocab-item {
+            background: #fff5f8;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border-left: 6px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ffe4e1;
+            gap: 10px;
+        }
+
+        .vocab-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .tips-box {
+            background: #fffdf0;
+            border: 2px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .backup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .backup-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="sensei-header">
+        <div class="sensei-avatar">
+            <span style="font-size: 1.1rem;">⌐■_■</span>
+            <span style="font-size: 1.5rem; margin-top: -5px;">🐱</span>
+        </div>
+        <div class="sensei-speech" id="sensei-text">
+            "Wow, du hast schon so viel gelernt! Lass uns das vertiefen! 🌸"
+        </div>
+    </div>
+
+    <!-- Lernerfolg Statistik Bar -->
+    <div class="stats-bar">
+        <div>✨ Richtig: <span id="stat-correct">0</span></div>
+        <div>❌ Falsch: <span id="stat-wrong">0</span></div>
+        <div>🔄 Wiederholungen: <span id="stat-reviewed">0</span></div>
+        <div>🏆 Quote: <span id="stat-rate">0%</span></div>
+    </div>
+
+<h1>🌸 Sensei Neko's Lern-App 🌸</h1>
+    
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-learn" onclick="switchTab('learn')">Karten</button>
+        <button class="tab-btn" id="tab-challenge" onclick="switchTab('challenge')">Quiz ⚡</button>
+        <button class="tab-btn" id="tab-tense" onclick="switchTab('tense')">Zeiten ⏳</button>
+        <button class="tab-btn" id="tab-sentence" onclick="switchTab('sentence')">Sätze 🧩</button>
+        <button class="tab-btn" id="tab-grammar" onclick="switchTab('grammar')">Grammatik 📜</button>
+        <button class="tab-btn" id="tab-kana" onclick="switchTab('kana')">Kana 🇯🇵</button>
+        <button class="tab-btn" id="tab-tips" onclick="switchTab('tips')">Spick 🐾</button>
+        <button class="tab-btn" id="tab-add" onclick="switchTab('add')">Neu</button>
+        <button class="tab-btn" id="tab-list" onclick="switchTab('list')">Liste</button>
+        <button class="tab-btn" id="tab-backup" onclick="switchTab('backup')">Backup</button>
+    </div>
+
+    <!-- REPEAT / LEARN SECTION -->
+    <div id="learn" class="section active">
+        <div class="filter-box">
+            <label for="filter-category">Kategorie:</label>
+            <select id="filter-category" onchange="filterQuizList()">
+                <option value="all">🌟 Alle Kategorien</option>
+                <option value="Kanji">⛩️ Kanji & Furigana</option>
+                <option value="Vokabeln">🍙 Vokabeln & Richtungen</option>
+                <option value="Grammatik">📜 Grammatik & Verben</option>
+                <option value="Adjektive">🎨 Adjektive (i & na)</option>
+            </select>
+            <button class="mode-toggle-btn" id="mode-btn" onclick="toggleQuizMode()">Modus: JP ➔ DE</button>
+        </div>
+
+        <div id="quiz-area">
+            <div class="card-container">
+                <div class="flashcard" id="card">
+                    <div class="card-face card-front">
+                        <div class="card-badge" id="front-badge">Kategorie</div>
+                        <div class="card-word" id="front-word">Vorderseite</div>
+                        <div class="card-hint" id="front-hint-text">Tippe unten die deutsche Bedeutung ein! ✍️</div>
+                    </div>
+                    <div class="card-face card-back" id="card-back-face">
+                        <div class="card-badge" id="back-badge">Bedeutung</div>
+                        <div class="card-meaning" id="back-meaning">Rückseite</div>
+                        <div class="card-hint" id="back-hint">Beispiel / Notiz</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-input-area" id="card-input-section">
+                <input type="text" id="vocab-answer-input" placeholder="Antwort eingeben..." onkeypress="handleCardInputKey(event)">
+                <button class="submit-btn" onclick="checkCardAnswer()" style="min-width: 90px;">Prüfen ✨</button>
+            </div>
+
+            <div class="quiz-controls">
+                <button class="btn-wrong" onclick="forceFlipAndFail()">Karte umdrehen (Nicht gewusst) ❌</button>
+                <button class="btn-correct" onclick="nextCardDirect()" id="next-btn" style="display:none;">Nächste Karte ✨</button>
+            </div>
+        </div>
+        <div id="empty-state" style="text-align: center; padding: 40px; display: none;">
+            <p>Neko-Sensei schläft... Keine Einträge in dieser Kategorie gefunden! 💤</p>
+        </div>
+    </div>
+
+    <!-- GENERAL QUIZ SECTION -->
+    <div id="challenge" class="section">
+        <div class="challenge-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 0.85rem; color: #888;">ALLGEMEINER QUIZ-TRAINER</div>
+                <div style="display: flex; gap: 5px;">
+                    <button class="mode-toggle-btn" id="quiz-type-btn" onclick="toggleQuizType()" style="background: var(--primary);">Typ: Multiple Choice</button>
+                    <button class="mode-toggle-btn" id="quiz-dir-btn" onclick="toggleQuizDirection()" style="background: var(--secondary);">Richtung: JP ➔ DE</button>
+                </div>
+            </div>
+
+            <div class="challenge-task" id="challenge-task-text">Lade Aufgabe...</div>
+            
+            <div id="quiz-input-area" style="display: none; margin-bottom: 15px; gap: 10px;">
+                <input type="text" id="dynamic-quiz-input" placeholder="Antwort eingeben..." onkeypress="handleDynamicInputKey(event)" style="width: 100%; text-align: center;">
+                <button class="submit-btn" onclick="checkDynamicInput()" style="margin-top: 10px; width: 100%;">Prüfen ✨</button>
+            </div>
+
+            <div class="mc-options" id="mc-options-container"></div>
+            
+            <button class="submit-btn" onclick="loadNewChallenge()" style="background: var(--secondary); margin-top: 15px; width: 100%;">Nächste Aufgabe 🎲</button>
+        </div>
+    </div>
+
+    <!-- ⏳ VERBEN-LABOR -->
+    <div id="tense" class="section">
+        <div class="tense-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 0.85rem; color: #888;">VERBEN-LABOR: ZEITEN-TRAINER</div>
+                <button class="mode-toggle-btn" id="tense-style-btn" onclick="toggleTenseStyle()" style="background: var(--primary);">Stil: Höflich (Masu)</button>
+            </div>
+
+            <div class="challenge-task" id="tense-task-text">Lade Verben-Konjugation...</div>
+            
+            <div class="mc-options" id="tense-options-container"></div>
+            
+            <button class="submit-btn" onclick="loadNewVerbLab()" style="background: var(--secondary); margin-top: 15px; width: 100%;">Nächste Konjugation ⏳</button>
+        </div>
+    </div>
+
+    <!-- 🧩 SATZ-BAUSTEINE -->
+    <div id="sentence" class="section">
+        <div class="sentence-box">
+            <div style="font-size: 0.85rem; color: #888; margin-bottom: 5px;">SATZ-TRAINER: PARTIKEL & ORTE VERKNÜPFEN</div>
+            <div class="challenge-task" id="sentence-task-text">Lade Satzaufgabe...</div>
+            
+            <div class="mc-options" id="sentence-options-container"></div>
+            
+            <button class="submit-btn" onclick="loadNewSentenceBuilder()" style="background: var(--secondary); margin-top: 15px; width: 100%;">Nächster Satz 🧩</button>
+        </div>
+    </div>
+
+    <!-- 📜 GRAMMATIK-LABOR -->
+    <div id="grammar" class="section">
+        <div class="grammar-lab-box">
+            <div style="font-size: 0.85rem; color: #888; margin-bottom: 5px;">FORTGESCHRITTENE GRAMMATIK & PARTIKEL-TRAINER</div>
+            <div class="challenge-task" id="grammar-task-text">Lade Grammatik-Aufgabe...</div>
+            
+            <div class="mc-options" id="grammar-options-container"></div>
+            
+            <button class="submit-btn" onclick="loadNewGrammarQuiz()" style="background: var(--secondary); margin-top: 15px; width: 100%;">Nächste Grammatik-Frage 📜</button>
+        </div>
+    </div>
+
+    <!-- KANA TRAINING SECTION -->
+    <div id="kana" class="section">
+        <div class="kana-box">
+            <div style="font-size: 0.85rem; color: #888; margin-bottom: 5px;">HIRAGANA & KATAKANA REPETITORIUM (KOMPLETT)</div>
+            <div class="challenge-task" id="kana-task-text">Lade Kana...</div>
+            
+            <div class="mc-options" id="kana-options-container"></div>
+            
+            <button class="submit-btn" onclick="loadNewKana()" style="background: var(--secondary); margin-top: 15px; width: 100%;">Nächster Buchstabe 🔠</button>
+        </div>
+    </div>
+
+    <!-- TIPS SECTION -->
+    <div id="tips" class="section">
+        <div class="tips-box">
+            <h3>🐾 Neko-Sensei's erweiterter Spickzettel</h3>
+            <p><b>1. Partikel-Übersicht:</b><br>
+            • <b>は (wa)</b> ➔ Thema des Satzes (Worum geht es?)<br>
+            • <b>が (ga)</b> ➔ Subjekt / Fokus (Wer/was tut es? Neuer Info-Fokus)<br>
+            • <b>を (o)</b> ➔ Akkusativ / direktes Objekt (Was wird gegessen/gemacht?)<br>
+            • <b>に (ni)</b> ➔ Ziel, Richtung oder Zeitpunkt (Wohin? Wann?)<br>
+            • <b>へ (e)</b> ➔ Richtung / zu (in Richtung von...)<br>
+            • <b>の (no)</b> ➔ Genitiv / Zugehörigkeit (z.B. mein Buch)</p>
+            <p><b>2. Adjektiv-Regeln (Neu!):</b><br>
+            • <b>i-Adjektive:</b> Enden auf -i (z.B. たかい / takai = teuer/hoch). Verneinung: `-kunai` (takakunai). Vergangenheit: `-katta` (takakatta).<br>
+            • <b>na-Adjektive:</b> Verhaltensweise wie Nomen (z.B. きれい / kirei = schön/sauber). Vor Nomen braucht es ein **な (na)** (z.B. kirei na kaban). Verneinung mit `ja arimasen`.</p>
+            <p><b>3. Te-Form Spezial:</b><br>
+            • <b>Verknüpfung:</b> A-te, B (und dann...)<br>
+            • <b>Gerade dabei sein:</b> [Te-Form] + います (imasu)</p>
+        </div>
+    </div>
+
+    <!-- ADD VOCAB SECTION -->
+    <div id="add" class="section">
+        <form id="vocab-form" onsubmit="saveVocab(event)">
+            <input type="hidden" id="edit-index" value="-1">
+            <div>
+                <label for="category">Kategorie:</label>
+                <select id="category" required onchange="checkCategoryChange()">
+                    <option value="Grammatik">📜 Grammatik & Verben</option>
+                    <option value="Vokabeln">🍙 Vokabeln (Nomen / Orte / Richtungen)</option>
+                    <option value="Kanji">⛩️ Kanji (mit Furigana)</option>
+                    <option value="Adjektive">🎨 Adjektive (i & na)</option>
+                </select>
+            </div>
+            
+            <div id="verb-type-container">
+                <label for="verb-type">Wortart / Unterkategorie:</label>
+                <select id="verb-type">
+                    <option value="u">U-Verb (z.B. kau, nomu)</option>
+                    <option value="ru">Ru-Verb (z.B. taberu, miru)</option>
+                    <option value="suru">Unregelmäßig (suru / kuru)</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="japanese">Begriff / Kanji (z. B. 日本(にほん) oder 赤(あか)い):</label>
+                <input type="text" id="japanese" required placeholder="z. B. 日本(にほん) oder 赤(あか)い">
+            </div>
+            <div style="font-size: 0.8rem; color: #888; margin-top: -10px;">
+                💡 Tipp: Klammern für Lesehilfe nutzen: <b>Wort(lesehilfe)</b>.
+            </div>
+            <div>
+                <label for="german">Deutsche Bedeutung (Rückseite):</label>
+                <input type="text" id="german" required placeholder="z. B. Japan oder rot">
+            </div>
+            <div>
+                <label for="example">Romaji-Schreibweise oder Notiz:</label>
+                <textarea id="example" rows="2" placeholder="z. B. Romaji: akai | Notiz: i-Adjektiv"></textarea>
+            </div>
+            <button type="submit" class="submit-btn" id="form-submit-btn">Eintrag ins Lernbuch eintragen ✨</button>
+        </form>
+    </div>
+
+    <!-- LIST SECTION -->
+    <div id="list" class="section">
+        <div class="vocab-list" id="vocab-list-container"></div>
+    </div>
+
+    <!-- BACKUP SECTION -->
+    <div id="backup" class="section">
+        <div class="backup-actions">
+            <button class="backup-btn" onclick="exportData()">📥 Backup herunterladen (Export)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let vocabularies = JSON.parse(localStorage.getItem('yvi_vocab_final')) || [
+        { category: "Grammatik", japanese: "<ruby>食<rt>た</rt></ruby>べる", german: "essen", example: "Romaji: taberu", verbType: "ru" },
+        { category: "Grammatik", japanese: "<ruby>飲<rt>の</rt></ruby>む", german: "trinken", example: "Romaji: nomu", verbType: "u" },
+        { category: "Vokabeln", japanese: "<ruby>日本<rt>にほん</rt></ruby>", german: "Japan", example: "Ort", verbType: "place" },
+        { category: "Adjektive", japanese: "<ruby>赤<rt>あか</rt></ruby>い", german: "rot", example: "Romaji: akai", verbType: "i-adj" }
+    ];
+
+    let stats = JSON.parse(localStorage.getItem('yvi_stats')) || { correct: 0, wrong: 0, reviewed: 0 };
+    let reverseMode = false;
+    let quizReverseMode = false;
+    let quizInputMode = false;
+    let tenseCasualMode = false;
+
+    const kanaList = [
+        { char: "あ", romaji: "a", type: "Hiragana" }, { char: "い", romaji: "i", type: "Hiragana" }, { char: "う", romaji: "u", type: "Hiragana" }, { char: "え", romaji: "e", type: "Hiragana" }, { char: "お", romaji: "o", type: "Hiragana" },
+        { char: "ア", romaji: "a", type: "Katakana" }, { char: "イ", romaji: "i", type: "Katakana" }, { char: "ウ", romaji: "u", type: "Katakana" }, { char: "エ", romaji: "e", type: "Katakana" }, { char: "オ", romaji: "o", type: "Katakana" },
+        { char: "か", romaji: "ka", type: "Hiragana" }, { char: "き", romaji: "ki", type: "Hiragana" }, { char: "く", romaji: "ku", type: "Hiragana" }, { char: "け", romaji: "ke", type: "Hiragana" }, { char: "こ", romaji: "ko", type: "Hiragana" },
+        { char: "カ", romaji: "ka", type: "Katakana" }, { char: "キ", romaji: "ki", type: "Katakana" }, { char: "ク", romaji: "ku", type: "Katakana" }, { char: "ケ", romaji: "ke", type: "Katakana" }, { char: "コ", romaji: "ko", type: "Katakana" },
+        { char: "さ", romaji: "sa", type: "Hiragana" }, { char: "し", romaji: "shi", type: "Hiragana" }, { char: "す", romaji: "su", type: "Hiragana" }, { char: "せ", romaji: "se", type: "Hiragana" }, { char: "そ", romaji: "so", type: "Hiragana" },
+        { char: "サ", romaji: "sa", type: "Katakana" }, { char: "シ", romaji: "shi", type: "Katakana" }, { char: "ス", romaji: "su", type: "Katakana" }, { char: "セ", romaji: "se", type: "Katakana" }, { char: "ソ", romaji: "so", type: "Katakana" },
+        { char: "た", romaji: "ta", type: "Hiragana" }, { char: "ち", romaji: "chi", type: "Hiragana" }, { char: "つ", romaji: "tsu", type: "Hiragana" }, { char: "て", romaji: "te", type: "Hiragana" }, { char: "と", romaji: "to", type: "Hiragana" },
+        { char: "タ", romaji: "ta", type: "Katakana" }, { char: "チ", romaji: "chi", type: "Katakana" }, { char: "ツ", romaji: "tsu", type: "Katakana" }, { char: "テ", romaji: "te", type: "Katakana" }, { char: "ト", romaji: "to", type: "Katakana" },
+        { char: "な", romaji: "na", type: "Hiragana" }, { char: "に", romaji: "ni", type: "Hiragana" }, { char: "ぬ", romaji: "nu", type: "Hiragana" }, { char: "ね", romaji: "ne", type: "Hiragana" }, { char: "の", romaji: "no", type: "Hiragana" },
+        { char: "ナ", romaji: "na", type: "Katakana" }, { char: "ニ", romaji: "ni", type: "Katakana" }, { char: "ヌ", romaji: "nu", type: "Katakana" }, { char: "ネ", romaji: "ne", type: "Katakana" }, { char: "ノ", romaji: "no", type: "Katakana" },
+        { char: "は", romaji: "ha", type: "Hiragana" }, { char: "ひ", romaji: "hi", type: "Hiragana" }, { char: "ふ", romaji: "fu", type: "Hiragana" }, { char: "へ", romaji: "he", type: "Hiragana" }, { char: "ほ", romaji: "ho", type: "Hiragana" },
+        { char: "ハ", romaji: "ha", type: "Katakana" }, { char: "ヒ", romaji: "hi", type: "Katakana" }, { char: "フ", romaji: "fu", type: "Katakana" }, { char: "ヘ", romaji: "he", type: "Katakana" }, { char: "ホ", romaji: "ho", type: "Katakana" },
+        { char: "ま", romaji: "ma", type: "Hiragana" }, { char: "み", romaji: "mi", type: "Hiragana" }, { char: "む", romaji: "mu", type: "Hiragana" }, { char: "め", romaji: "me", type: "Hiragana" }, { char: "も", romaji: "mo", type: "Hiragana" },
+        { char: "マ", romaji: "ma", type: "Katakana" }, { char: "ミ", romaji: "mi", type: "Katakana" }, { char: "ム", romaji: "mu", type: "Katakana" }, { char: "メ", romaji: "me", type: "Katakana" }, { char: "モ", romaji: "mo", type: "Katakana" },
+        { char: "や", romaji: "ya", type: "Hiragana" }, { char: "ゆ", romaji: "yu", type: "Hiragana" }, { char: "よ", romaji: "yo", type: "Hiragana" },
+        { char: "ヤ", romaji: "ya", type: "Katakana" }, { char: "ユ", romaji: "yu", type: "Katakana" }, { char: "ヨ", romaji: "yo", type: "Katakana" },
+        { char: "ら", romaji: "ra", type: "Hiragana" }, { char: "り", romaji: "ri", type: "Hiragana" }, { char: "る", romaji: "ru", type: "Hiragana" }, { char: "れ", romaji: "re", type: "Hiragana" }, { char: "ろ", romaji: "ro", type: "Hiragana" },
+        { char: "ラ", romaji: "ra", type: "Katakana" }, { char: "リ", romaji: "ri", type: "Katakana" }, { char: "ル", romaji: "ru", type: "Katakana" }, { char: "レ", romaji: "re", type: "Katakana" }, { char: "ロ", romaji: "ro", type: "Katakana" },
+        { char: "わ", romaji: "wa", type: "Hiragana" }, { char: "を", romaji: "wo", type: "Hiragana" }, { char: "ん", romaji: "n", type: "Hiragana" },
+        { char: "ワ", romaji: "wa", type: "Katakana" }, { char: "ヲ", romaji: "wo", type: "Katakana" }, { char: "ン", romaji: "n", type: "Katakana" }
+    ];
+
+    let activeQueue = [];
+    let currentIndex = 0;
+    let isFlipped = false;
+    let currentQuizTarget = null;
+
+    window.onload = function() {
+        if (stats.wrong === undefined) stats.wrong = 0;
+        updateStatsDisplay();
+        filterQuizList();
+        checkCategoryChange();
+    };
+
+    function updateStatsDisplay() {
+        document.getElementById('stat-correct').innerText = stats.correct;
+        document.getElementById('stat-wrong').innerText = stats.wrong;
+        document.getElementById('stat-reviewed').innerText = stats.reviewed;
+        const rate = stats.reviewed > 0 ? Math.round((stats.correct / stats.reviewed) * 100) : 0;
+        document.getElementById('stat-rate').innerText = rate + '%';
+        localStorage.setItem('yvi_stats', JSON.stringify(stats));
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        const activeTabBtn = document.getElementById('tab-' + tabId);
+        if (activeTabBtn) {
+            activeTabBtn.classList.add('active');
+        }
+
+        if (tabId === 'learn') {
+            filterQuizList();
+        } else if (tabId === 'challenge') {
+            loadNewChallenge();
+        } else if (tabId === 'tense') {
+            loadNewVerbLab();
+        } else if (tabId === 'sentence') {
+            loadNewSentenceBuilder();
+        } else if (tabId === 'grammar') {
+            loadNewGrammarQuiz();
+        } else if (tabId === 'kana') {
+            loadNewKana();
+        } else if (tabId === 'list') {
+            renderList();
+        } else if (tabId === 'add') {
+            resetAddForm();
+        }
+    }
+
+    function checkCategoryChange() {
+        const cat = document.getElementById('category').value;
+        const verbTypeSelect = document.getElementById('verb-type');
+        
+        verbTypeSelect.innerHTML = '';
+        if (cat === 'Grammatik') {
+            verbTypeSelect.innerHTML = `
+                <option value="u">U-Verb (z.B. kau, nomu)</option>
+                <option value="ru">Ru-Verb (z.B. taberu, miru)</option>
+                <option value="suru">Unregelmäßig (suru / kuru)</option>
+            `;
+        } else if (cat === 'Adjektive') {
+            verbTypeSelect.innerHTML = `
+                <option value="i-adj">i-Adjektiv (z.B. akai, takai)</option>
+                <option value="na-adj">na-Adjektiv (z.B. kirei, genki)</option>
+            `;
+        } else {
+            verbTypeSelect.innerHTML = `
+                <option value="place">Ort / Ziel (für Sätze mit 'ni', z.B. Japan)</option>
+                <option value="direction">Richtungsangabe / Adverb (z.B. rechts, links)</option>
+                <option value="object">Nomen / Objekt (für Sätze mit 'wo', z.B. Wasser)</option>
+            `;
+        }
+    }
+
+    function resetAddForm() {
+        document.getElementById('vocab-form').reset();
+        document.getElementById('edit-index').value = "-1";
+        document.getElementById('form-submit-btn').innerText = "Eintrag ins Lernbuch eintragen ✨";
+        document.getElementById('tab-add').innerText = "Neu";
+        checkCategoryChange();
+    }
+
+    function parseFurigana(input) {
+        return input.replace(/([^\(]+)\(([^\)]+)\)/g, '<ruby>$1<rt>$2</rt></ruby>');
+    }
+
+    function toggleQuizMode() {
+        reverseMode = !reverseMode;
+        const btn = document.getElementById('mode-btn');
+        if (reverseMode) {
+            btn.innerText = "Modus: DE ➔ JP";
+            btn.style.background = "var(--primary)";
+            document.getElementById('sensei-text').innerHTML = '"Jetzt wird Deutsch gefragt und Romaji eingetippt! ⌐■_■"';
+        } else {
+            btn.innerText = "Modus: JP ➔ DE";
+            btn.style.background = "var(--secondary)";
+            document.getElementById('sensei-text').innerHTML = '"Modus zurückgestellt auf JP ➔ DE. 🌸"';
+        }
+        showCard();
+    }
+
+    function toggleQuizType() {
+        quizInputMode = !quizInputMode;
+        const btn = document.getElementById('quiz-type-btn');
+        if (quizInputMode) {
+            btn.innerText = "Typ: Freitext-Eingabe";
+            btn.style.background = "var(--secondary)";
+        } else {
+            btn.innerText = "Typ: Multiple Choice";
+            btn.style.background = "var(--primary)";
+        }
+        loadNewChallenge();
+    }
+
+    function toggleQuizDirection() {
+        quizReverseMode = !quizReverseMode;
+        const btn = document.getElementById('quiz-dir-btn');
+        if (quizReverseMode) {
+            btn.innerText = "Richtung: DE ➔ JP";
+            btn.style.background = "var(--primary)";
+        } else {
+            btn.innerText = "Richtung: JP ➔ DE";
+            btn.style.background = "var(--secondary)";
+        }
+        loadNewChallenge();
+    }
+
+    function toggleTenseStyle() {
+        tenseCasualMode = !tenseCasualMode;
+        const btn = document.getElementById('tense-style-btn');
+        if (tenseCasualMode) {
+            btn.innerText = "Stil: Casual / Umgangssprache";
+            btn.style.background = "var(--secondary)";
+            document.getElementById('sensei-text').innerHTML = '"Jetzt trainieren wir die lockeren Casual-Formen! 🌸"';
+        } else {
+            btn.innerText = "Stil: Höflich (Masu)";
+            btn.style.background = "var(--primary)";
+            document.getElementById('sensei-text').innerHTML = '"Zurück zu den höflichen Formen! ⌐■_■"';
+        }
+        loadNewVerbLab();
+    }
+
+    function filterQuizList() {
+        const filterVal = document.getElementById('filter-category').value;
+        if (filterVal === 'all') {
+            activeQueue = [...vocabularies];
+        } else {
+            activeQueue = vocabularies.filter(item => item.category === filterVal);
+        }
+        activeQueue.sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        initQuiz();
+    }
+
+    function initQuiz() {
+        const quizArea = document.getElementById('quiz-area');
+        const emptyState = document.getElementById('empty-state');
+
+        if (activeQueue.length === 0) {
+            quizArea.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        quizArea.style.display = 'block';
+        emptyState.style.display = 'none';
+        showCard();
+    }
+
+    function showCard() {
+        if (activeQueue.length === 0) return;
+        isFlipped = false;
+        
+        const cardElem = document.getElementById('card');
+        cardElem.classList.add('no-transition');
+        cardElem.classList.remove('flipped');
+        document.getElementById('card-back-face').classList.remove('error-back');
+        void cardElem.offsetWidth;
+        cardElem.classList.remove('no-transition');
+
+        document.getElementById('vocab-answer-input').value = "";
+        document.getElementById('vocab-answer-input').disabled = false;
+        document.getElementById('card-input-section').style.display = 'flex';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const current = activeQueue[currentIndex];
+        document.getElementById('front-badge').innerText = current.category;
+        
+        if (!reverseMode) {
+            document.getElementById('front-word').innerHTML = current.japanese;
+            document.getElementById('front-hint-text').innerText = "Tippe unten die deutsche Bedeutung ein! ✍️";
+            document.getElementById('vocab-answer-input').placeholder = "Deutsche Bedeutung eingeben...";
+            
+            document.getElementById('back-badge').innerText = current.category;
+            document.getElementById('back-meaning').innerText = current.german;
+            document.getElementById('back-hint').innerHTML = current.example ? current.example.replace(/\n/g, '<br>') : 'Kein Beispielsatz hinterlegt.';
+        } else {
+            document.getElementById('front-word').innerHTML = current.german;
+            document.getElementById('front-hint-text').innerText = "Tippe unten die Romaji-Schreibweise ein! ✍️";
+            document.getElementById('vocab-answer-input').placeholder = "Romaji eingeben (z.B. akai)...";
+            
+            document.getElementById('back-badge').innerText = current.category;
+            document.getElementById('back-meaning').innerHTML = current.japanese;
+            document.getElementById('back-hint').innerHTML = current.example ? current.example.replace(/\n/g, '<br>') : 'Kein Beispielsatz hinterlegt.';
+        }
+    }
+
+    function checkAnswerMatch(userVal, targetStr) {
+        userVal = userVal.trim().toLowerCase();
+        const parts = targetStr.toLowerCase().split(/[,;\/]+/);
+        for (let p of parts) {
+            if (p.trim() === userVal) return true;
+        }
+        return false;
+    }
+
+    function checkCardAnswer() {
+        if (isFlipped) return;
+        const userVal = document.getElementById('vocab-answer-input').value.trim();
+        const current = activeQueue[currentIndex];
+
+        if (!userVal) {
+            alert("Bitte gib eine Antwort ein! ⌐■_■");
+            return;
+        }
+
+        stats.reviewed++;
+        let isCorrect = false;
+
+        if (!reverseMode) {
+            isCorrect = checkAnswerMatch(userVal, current.german);
+        } else {
+            const exampleStr = current.example || "";
+            const japaneseStr = current.japanese.replace(/<ruby>[^<]+<rt>([^<]+)<\/rt><\/ruby>/g, '$1');
+            isCorrect = checkAnswerMatch(userVal, exampleStr) || checkAnswerMatch(userVal, japaneseStr) || userVal === japaneseStr.toLowerCase();
+        }
+
+        if (isCorrect) {
+            stats.correct++;
+            isFlipped = true;
+            document.getElementById('card-back-face').classList.remove('error-back');
+            document.getElementById('card').classList.add('flipped');
+            document.getElementById('vocab-answer-input').disabled = true;
+            document.getElementById('card-input-section').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'block';
+            document.getElementById('sensei-text').innerHTML = '"Exzellent! Richtig getippt! ✨🎉"';
+        } else {
+            stats.wrong++;
+            isFlipped = true;
+            document.getElementById('card-back-face').classList.add('error-back');
+            
+            document.getElementById('card').classList.add('flipped');
+            document.getElementById('vocab-answer-input').disabled = true;
+            document.getElementById('card-input-section').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'block';
+            document.getElementById('sensei-text').innerHTML = '"Leider falsch! Schau auf die rote Rückseite für die Lösung. ⌐■_■"';
+            
+            if (activeQueue.length > 1) {
+                const currentItem = activeQueue.splice(currentIndex, 1)[0];
+                activeQueue.push(currentItem);
+                currentIndex--;
+            }
+        }
+        updateStatsDisplay();
+    }
+
+    function handleCardInputKey(event) {
+        if (event.key === 'Enter') checkCardAnswer();
+    }
+
+    function forceFlipAndFail() {
+        stats.reviewed++;
+        stats.wrong++;
+        isFlipped = true;
+        document.getElementById('card-back-face').classList.add('error-back');
+
+        document.getElementById('card').classList.add('flipped');
+        document.getElementById('vocab-answer-input').disabled = true;
+        document.getElementById('card-input-section').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+        document.getElementById('sensei-text').innerHTML = '"Kein Problem, Karte wird zur Wiederholung weiter hinten eingereiht! ⌐■_■"';
+        
+        if (activeQueue.length > 1) {
+            const currentItem = activeQueue.splice(currentIndex, 1)[0];
+            activeQueue.push(currentItem);
+            currentIndex--;
+        }
+        updateStatsDisplay();
+    }
+
+    function nextCardDirect() {
+        currentIndex = (currentIndex + 1) % activeQueue.length;
+        showCard();
+    }
+
+    function loadNewChallenge() {
+        const container = document.getElementById('mc-options-container');
+        const inputArea = document.getElementById('quiz-input-area');
+        container.innerHTML = '';
+        document.getElementById('dynamic-quiz-input').value = '';
+
+        if (vocabularies.length < 2) {
+            document.getElementById('challenge-task-text').innerHTML = "Du brauchst mindestens 2 Einträge in deiner Liste für das Quiz! 🍃";
+            inputArea.style.display = 'none';
+            return;
+        }
+
+        currentQuizTarget = vocabularies[Math.floor(Math.random() * vocabularies.length)];
+
+        if (!quizReverseMode) {
+            document.getElementById('challenge-task-text').innerHTML = `Was bedeutet folgender Begriff auf Deutsch?<br><br><span style="font-size:2.2rem; color:var(--primary);">${currentQuizTarget.japanese}</span>`;
+        } else {
+            document.getElementById('challenge-task-text').innerHTML = `Wie schreibt man folgenden Begriff auf Japanisch/Romaji?<br><br><span style="font-size:2.2rem; color:var(--primary);">${currentQuizTarget.german}</span>`;
+        }
+
+        if (quizInputMode) {
+            inputArea.style.display = 'block';
+            container.style.display = 'none';
+            document.getElementById('dynamic-quiz-input').focus();
+        } else {
+            inputArea.style.display = 'none';
+            container.style.display = 'flex';
+
+            let correctAnswer = !quizReverseMode ? currentQuizTarget.german.split(',')[0].trim() : currentQuizTarget.japanese;
+            let options = [correctAnswer];
+
+            while (options.length < 3 && options.length < vocabularies.length) {
+                const randomItem = vocabularies[Math.floor(Math.random() * vocabularies.length)];
+                const wrongAnswer = !quizReverseMode ? randomItem.german.split(',')[0].trim() : randomItem.japanese;
+                if (!options.includes(wrongAnswer)) {
+                    options.push(wrongAnswer);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'mc-btn';
+                btn.innerHTML = opt;
+                btn.onclick = function() {
+                    stats.reviewed++;
+                    if (opt === correctAnswer) {
+                        btn.classList.add('correct');
+                        stats.correct++;
+                        document.getElementById('sensei-text').innerHTML = '"Hervorragend! Richtig getippt! ✨🎉"';
+                        container.querySelectorAll('button').forEach(b => b.disabled = true);
+                    } else {
+                        btn.classList.add('wrong');
+                        stats.wrong++;
+                        document.getElementById('sensei-text').innerHTML = '"Falsch! Neko-Sensei schüttelt den Kopf. ⌐■_■"';
+                        container.querySelectorAll('button').forEach(b => {
+                            if (b.innerHTML === correctAnswer) b.classList.add('correct');
+                            b.disabled = true;
+                        });
+                    }
+                    updateStatsDisplay();
+                };
+                container.appendChild(btn);
+            });
+        }
+    }
+
+    function checkDynamicInput() {
+        if (!currentQuizTarget) return;
+        const userVal = document.getElementById('dynamic-quiz-input').value.trim();
+        if (!userVal) {
+            alert("Bitte gib eine Antwort ein! ⌐■_■");
+            return;
+        }
+
+        stats.reviewed++;
+        let isCorrect = false;
+
+        if (!quizReverseMode) {
+            isCorrect = checkAnswerMatch(userVal, currentQuizTarget.german);
+        } else {
+            const exampleStr = currentQuizTarget.example || "";
+            const japaneseStr = currentQuizTarget.japanese.replace(/<ruby>[^<]+<rt>([^<]+)<\/rt><\/ruby>/g, '$1');
+            isCorrect = checkAnswerMatch(userVal, exampleStr) || checkAnswerMatch(userVal, japaneseStr);
+        }
+
+        if (isCorrect) {
+            stats.correct++;
+            document.getElementById('sensei-text').innerHTML = '"Exzellent! Richtig getippt! ✨🎉"';
+            alert("Richtig! Gut gemacht! ✨");
+            loadNewChallenge();
+        } else {
+            stats.wrong++;
+            document.getElementById('sensei-text').innerHTML = '"Leider falsch! Versuch es bei der nächsten Aufgabe. ⌐■_■"';
+            alert(`Fast! Die korrekte Antwort war: ${!quizReverseMode ? currentQuizTarget.german : currentQuizTarget.japanese}`);
+            loadNewChallenge();
+        }
+        updateStatsDisplay();
+    }
+
+    function handleDynamicInputKey(event) {
+        if (event.key === 'Enter') checkDynamicInput();
+    }
+
+    function loadNewVerbLab() {
+        const container = document.getElementById('tense-options-container');
+        container.innerHTML = '';
+
+        const verbPool = vocabularies.filter(v => v.category === 'Grammatik');
+        
+        if (verbPool.length === 0) {
+            document.getElementById('tense-task-text').innerHTML = "Du hast noch keine Verben unter der Kategorie <b>Grammatik & Verben</b> eingetragen! 🍃";
+            return;
+        }
+
+        const randomVerb = verbPool[Math.floor(Math.random() * verbPool.length)];
+        let rawJap = randomVerb.japanese;
+        let vType = randomVerb.verbType || "u";
+
+        let kanjiChar = "";
+        let kanjiReading = "";
+        let baseEnding = "";
+
+        if (rawJap.includes("<ruby>")) {
+            let match = rawJap.match(/<ruby>([^<]+)<rt>([^<]+)<\/rt><\/ruby>(.*)/);
+            if (match) {
+                kanjiChar = match[1];
+                kanjiReading = match[2];
+                baseEnding = match[3].trim();
+            }
+        } else {
+            kanjiChar = rawJap.slice(0, 1);
+            kanjiReading = rawJap.slice(0, 1);
+            baseEnding = rawJap.slice(1);
+        }
+
+        if (!baseEnding) {
+            if (vType === "ru") baseEnding = "べる";
+            else if (vType === "u") baseEnding = "う";
+        }
+
+        let targets = [];
+
+        if (!tenseCasualMode) {
+            let renderedCorrect = "";
+            let renderedWrong1 = "";
+            let renderedWrong2 = "";
+            let renderedWrong3 = "";
+
+            if (rawJap.includes("来る") || kanjiChar === "来") {
+                renderedCorrect = `<ruby>来<rt>き</rt></ruby>ます`;
+                renderedWrong1 = `<ruby>来<rt>き</rt></ruby>ません`;
+                renderedWrong2 = `<ruby>来<rt>き</rt></ruby>ました`;
+                renderedWrong3 = `<ruby>来<rt>き</rt></ruby>ませんでした`;
+            } else if (vType === "ru") {
+                let stemKana = baseEnding.slice(0, -1);
+                renderedCorrect = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stemKana}ます`;
+                renderedWrong1 = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stemKana}ません`;
+                renderedWrong2 = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stemKana}ました`;
+                renderedWrong3 = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stemKana}ませんでした`;
+            } else {
+                let lastChar = baseEnding.slice(-1);
+                let map = { "う": "い", "く": "き", "ぐ": "ぎ", "す": "し", "つ": "ち", "ぬ": "に", "ぶ": "び", "む": "み", "る": "り" };
+                let convertedKana = map[lastChar] || "い";
+                renderedCorrect = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${convertedKana}ます`;
+                renderedWrong1 = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${convertedKana}ません`;
+                renderedWrong2 = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${convertedKana}ました`;
+                renderedWrong3 = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${convertedKana}ませんでした`;
+            }
+
+            targets = [
+                { name: "Höfliche Gegenwart", correct: renderedCorrect, wrong: renderedWrong1 },
+                { name: "Höfliche Verneinung", correct: renderedWrong1, wrong: renderedCorrect },
+                { name: "Höfliche Vergangenheit", correct: renderedWrong2, wrong: renderedWrong3 },
+                { name: "Höflich verneinte Vergangenheit", correct: renderedWrong3, wrong: renderedCorrect }
+            ];
+        } else {
+            let dictForm = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${baseEnding}`;
+            let naiForm = "";
+            let taForm = "";
+
+            if (rawJap.includes("来る") || kanjiChar === "来") {
+                naiForm = `<ruby>来<rt>こ</rt></ruby>ない`;
+                taForm = `<ruby>来<rt>き</rt></ruby>た`;
+            } else if (vType === "ru") {
+                let stem = baseEnding.slice(0, -1);
+                naiForm = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stem}ない`;
+                taForm = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stem}た`;
+            } else {
+                let last = baseEnding.slice(-1);
+                let aMap = { "う": "わ", "く": "か", "ぐ": "が", "す": "さ", "つ": "た", "ぬ": "な", "ぶ": "ば", "む": "ま", "る": "ら" };
+                let aKana = aMap[last] || "あ";
+                naiForm = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${aKana}ない`;
+
+                if (rawJap.includes("行") || kanjiChar === "行") {
+                    taForm = `<ruby>行<rt>い</rt></ruby>った`;
+                } else {
+                    let tEnding = "った";
+                    if (["mu","nu","bu"].includes(last) || ["む","ぬ","ぶ"].includes(last)) tEnding = "んだ";
+                    if (last === "く") tEnding = "いた";
+                    if (last === "ぐ") tEnding = "いだ";
+                    if (last === "す") tEnding = "した";
+                    taForm = `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${tEnding}`;
+                }
+            }
+
+            targets = [
+                { name: "Gegenwart (Dictionary-Form)", correct: dictForm, wrong: naiForm },
+                { name: "Verneinung", correct: naiForm, wrong: dictForm },
+                { name: "Vergangenheit", correct: taForm, wrong: naiForm }
+            ];
+        }
+
+        const selectedTarget = targets[Math.floor(Math.random() * targets.length)];
+
+        document.getElementById('tense-task-text').innerHTML = `Verb: <span style="font-size:1.8rem; color:var(--primary);">${randomVerb.japanese}</span> (${randomVerb.german})<br><br>Wie lautet die <b>${selectedTarget.name}</b>?`;
+
+        let options = [selectedTarget.correct];
+        let wrongPool = [selectedTarget.wrong, targets[0].correct, targets[targets.length - 1].correct];
+        
+        wrongPool.sort(() => Math.random() - 0.5);
+        for (let w of wrongPool) {
+            if (options.length < 3 && !options.includes(w)) {
+                options.push(w);
+            }
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'mc-btn';
+            btn.innerHTML = opt;
+            const isCorrect = (opt === selectedTarget.correct);
+
+            btn.onclick = function() {
+                stats.reviewed++;
+                if (isCorrect) {
+                    btn.classList.add('correct');
+                    stats.correct++;
+                    document.getElementById('sensei-text').innerHTML = '"Exzellent! Perfekt konjugiert! ✨🌸"';
+                    container.querySelectorAll('button').forEach(b => b.disabled = true);
+                } else {
+                    btn.classList.add('wrong');
+                    stats.wrong++;
+                    document.getElementById('sensei-text').innerHTML = '"Fast! Achte genau auf die Endung. ⌐■_■"';
+                    container.querySelectorAll('button').forEach(b => {
+                        if (b.innerHTML === selectedTarget.correct) b.classList.add('correct');
+                        b.disabled = true;
+                    });
+                }
+                updateStatsDisplay();
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function getTeForm(v) {
+        let rawJap = v.japanese;
+        let vType = v.verbType || "u";
+        let kanjiChar = "";
+        let kanjiReading = "";
+        let baseEnding = "";
+
+        if (rawJap.includes("来る") || rawJap.includes("くる") || kanjiChar === "来") {
+            return `<ruby>来<rt>き</rt></ruby>て`;
+        }
+
+        if (rawJap.includes("<ruby>")) {
+            let match = rawJap.match(/<ruby>([^<]+)<rt>([^<]+)<\/rt><\/ruby>(.*)/);
+            if (match) {
+                kanjiChar = match[1];
+                kanjiReading = match[2];
+                baseEnding = match[3].trim();
+            }
+        } else {
+            kanjiChar = rawJap.slice(0, 1);
+            kanjiReading = rawJap.slice(0, 1);
+            baseEnding = rawJap.slice(1);
+        }
+
+        if (!baseEnding) {
+            if (vType === "ru") baseEnding = "べる";
+            else if (vType === "u") baseEnding = "う";
+        }
+
+        if (vType === "ru") {
+            let stem = baseEnding.slice(0, -1);
+            return `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${stem}て`;
+        } else {
+            let last = baseEnding.slice(-1);
+            let tEnding = "って";
+            
+            if (last === "む" || last === "ぬ" || last === "ぶ" || last === "mu" || last === "nu" || last === "bu") {
+                tEnding = "で";
+            } else if (last === "く" || last === "ku") {
+                if (rawJap.includes("行") || kanjiChar === "行") return `<ruby>行<rt>い</rt></ruby>って`;
+                tEnding = "いて";
+            } else if (last === "ぐ" || last === "gu") {
+                tEnding = "いで";
+            } else if (last === "す" || last === "su") {
+                tEnding = "して";
+            }
+
+            return `<ruby>${kanjiChar}<rt>${kanjiReading}</rt></ruby>${tEnding}`;
+        }
+    }
+
+    function loadNewSentenceBuilder() {
+        const container = document.getElementById('sentence-options-container');
+        container.innerHTML = '';
+
+        const verbPool = vocabularies.filter(v => v.category === 'Grammatik');
+        const placePool = vocabularies.filter(v => v.verbType === 'place');
+
+        if (verbPool.length === 0) {
+            document.getElementById('sentence-task-text').innerHTML = "Du brauchst mindestens <b>1 Verb</b> in deiner Liste, um Sätze zu bauen! 🍃";
+            return;
+        }
+
+        let mode = (placePool.length > 0 && Math.random() > 0.4) ? 'place' : 'verbs';
+
+        if (mode === 'place' && placePool.length > 0) {
+            let place = placePool[Math.floor(Math.random() * placePool.length)];
+            let verb = verbPool[Math.floor(Math.random() * verbPool.length)];
+
+            let correctAnswer = `${place.japanese}に${verb.japanese}`;
+            let wrong1 = `${place.japanese}${verb.japanese}`;
+            let wrong2 = `${place.japanese}で${verb.japanese}`;
+
+            document.getElementById('sentence-task-text').innerHTML = `Bilde einen Satz mit Ziel/Richtung:<br><br><b>${place.german}</b> (${place.japanese}) + <b>${verb.german}</b> (${verb.japanese})`;
+
+            let options = [correctAnswer, wrong1, wrong2];
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'mc-btn';
+                btn.innerHTML = opt;
+                const isCorrect = (opt === correctAnswer);
+
+                btn.onclick = function() {
+                    stats.reviewed++;
+                    if (isCorrect) {
+                        btn.classList.add('correct');
+                        stats.correct++;
+                        document.getElementById('sensei-text').innerHTML = '"Hervorragend! Die Orts-Partikel [に] sitzt perfekt! ✨🌸"';
+                        container.querySelectorAll('button').forEach(b => b.disabled = true);
+                    } else {
+                        btn.classList.add('wrong');
+                        stats.wrong++;
+                        document.getElementById('sensei-text').innerHTML = '"Fast! Bei einer Bewegung zu einem Ort nutzt man die Partikel [に]. ⌐■_■"';
+                        container.querySelectorAll('button').forEach(b => {
+                            if (b.innerHTML === correctAnswer) b.classList.add('correct');
+                            b.disabled = true;
+                        });
+                    }
+                    updateStatsDisplay();
+                };
+                container.appendChild(btn);
+            });
+
+        } else {
+            if (verbPool.length < 2) {
+                document.getElementById('sentence-task-text').innerHTML = "Du brauchst mindestens <b>2 Verben</b> in deiner Grammatik-Liste, um Handlungen mit der Te-Form zu verknüpfen! Füge im Reiter 'Neu' ein weiteres Verb hinzu. 🍃";
+                return;
+            }
+
+            let shuffledVerbs = [...verbPool].sort(() => Math.random() - 0.5);
+            let verb1 = shuffledVerbs[0];
+            let verb2 = shuffledVerbs[1];
+
+            let verb1Te = getTeForm(verb1);
+            let correctAnswer = `${verb1Te}、${verb2.japanese}`;
+            let wrong1 = `${verb1.japanese}、${verb2.japanese}`;
+            let wrongTe = verb1Te.replace("で", "て").replace("して", "ちて").replace("きて", "くて");
+            let wrong2 = `${wrongTe}、${verb2.japanese}`;
+
+            document.getElementById('sentence-task-text').innerHTML = `Verknüpfe diese zwei Handlungen mit der Te-Form:<br><br>1. <b>${verb1.german}</b> (${verb1.japanese})<br>2. <b>${verb2.german}</b> (${verb2.japanese})`;
+
+            let options = [correctAnswer, wrong1, wrong2];
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'mc-btn';
+                btn.innerHTML = opt;
+                const isCorrect = (opt === correctAnswer);
+
+                btn.onclick = function() {
+                    stats.reviewed++;
+                    if (isCorrect) {
+                        btn.classList.add('correct');
+                        stats.correct++;
+                        document.getElementById('sensei-text').innerHTML = '"Fantastisch! Die Te-Form verbindet die Handlungen perfekt! ✨🌸"';
+                        container.querySelectorAll('button').forEach(b => b.disabled = true);
+                    } else {
+                        btn.classList.add('wrong');
+                        stats.wrong++;
+                        document.getElementById('sensei-text').innerHTML = '"Fast! Das erste Verb muss in der korrekten Te-Form stehen. ⌐■_■"';
+                        container.querySelectorAll('button').forEach(b => {
+                            if (b.innerHTML === correctAnswer) b.classList.add('correct');
+                            b.disabled = true;
+                        });
+                    }
+                    updateStatsDisplay();
+                };
+                container.appendChild(btn);
+            });
+        }
+    }
+
+    const grammarQuestions = [
+        {
+            task: "Welche Partikel markiert das <b>Thema</b> eines Satzes (Worum geht es im Satz)?",
+            correct: "は (wa)",
+            wrong: ["が (ga)", "を (o)", "に (ni)"]
+        },
+        {
+            task: "Welche Partikel markiert das <b>direkte Objekt</b> (Akkusativ), auf das sich die Handlung direkt auswirkt?",
+            correct: "を (o)",
+            wrong: ["は (wa)", "に (ni)", "の (no)"]
+        },
+        {
+            task: "Welche Partikel drückt ein <b>Ziel oder eine Richtung</b> einer Bewegung aus (z.B. nach Japan gehen)?",
+            correct: "に (ni) / へ (e)",
+            wrong: ["を (o)", "は (wa)", "が (ga)"]
+        },
+        {
+            task: "Wie bildet man im Japanischen den Ausdruck <b>„gerade dabei sein, etwas zu tun“</b>?",
+            correct: "[Te-Form] + います (imasu)",
+            wrong: ["[Te-Form] + くだちゃい (kudasai)", "[Wurzel] + ません (masen)", "Dictionary-Form + こと"]
+        },
+        {
+            task: "Wie bittet man höflich jemanden etwas zu tun (<b>„Bitte mach...“</b>)?",
+            correct: "[Te-Form] + くだちゃい (kudasai)",
+            wrong: ["[Te-Form] + はいけません (wa ikemasen)", "[Te-Form] + もいいです (mo ii desu)", "Dictionary-Form + desu"]
+        },
+        {
+            task: "Wie drückt man aus, dass man etwas <b>tun darf</b> (Erlaubnis)?",
+            correct: "[Te-Form] + もいいです (mo ii desu)",
+            wrong: ["[Te-Form] + はいけません (wa ikemasen)", "[Te-Form] + います (imasu)", "Dictionary-Form + nai"]
+        },
+        {
+            task: "Welche Partikel zeigt den <b>Besitz</b> oder eine Zuordnung an (Genitiv, z.B. Yvi-san no Neko)?",
+            correct: "の (no)",
+            wrong: ["に (ni)", "を (o)", "가 (ga)"]
+        }
+    ];
+
+    function loadNewGrammarQuiz() {
+        const container = document.getElementById('grammar-options-container');
+        container.innerHTML = '';
+
+        const q = grammarQuestions[Math.floor(Math.random() * grammarQuestions.length)];
+        document.getElementById('grammar-task-text').innerHTML = q.task;
+
+        let options = [q.correct, ...q.wrong];
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'mc-btn';
+            btn.innerHTML = opt;
+            const isCorrect = (opt === q.correct);
+
+            btn.onclick = function() {
+                stats.reviewed++;
+                if (isCorrect) {
+                    btn.classList.add('correct');
+                    stats.correct++;
+                    document.getElementById('sensei-text').innerHTML = '"Wunderbar! Grammatik-Profi! ✨🌸"';
+                    container.querySelectorAll('button').forEach(b => b.disabled = true);
+                } else {
+                    btn.classList.add('wrong');
+                    stats.wrong++;
+                    document.getElementById('sensei-text').innerHTML = '"Fast! Schau im Spickzettel nach den Regeln. ⌐■_■"';
+                    container.querySelectorAll('button').forEach(b => {
+                        if (b.innerHTML === q.correct) b.classList.add('correct');
+                        b.disabled = true;
+                    });
+                }
+                updateStatsDisplay();
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function loadNewKana() {
+        const target = kanaList[Math.floor(Math.random() * kanaList.length)];
+        const container = document.getElementById('kana-options-container');
+        container.innerHTML = '';
+
+        document.getElementById('kana-task-text').innerHTML = `Wie lautet das Romaji für dieses ${target.type}?<br><br><span style="font-size:3.5rem; color:var(--secondary);">${target.char}</span>`;
+
+        let options = [target.romaji];
+        while (options.length < 3) {
+            const randomWrong = kanaList[Math.floor(Math.random() * kanaList.length)].romaji;
+            if (!options.includes(randomWrong)) {
+                options.push(randomWrong);
+            }
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'mc-btn';
+            btn.innerText = opt;
+            btn.onclick = function() {
+                stats.reviewed++;
+                if (opt === target.romaji) {
+                    btn.classList.add('correct');
+                    stats.correct++;
+                    document.getElementById('sensei-text').innerHTML = '"Richtig! Gut aufgepasst. 🌸"';
+                    container.querySelectorAll('button').forEach(b => b.disabled = true);
+                } else {
+                    btn.classList.add('wrong');
+                    stats.wrong++;
+                    container.querySelectorAll('button').forEach(b => {
+                        if (b.innerText === target.romaji) b.classList.add('correct');
+                        b.disabled = true;
+                    });
+                }
+                updateStatsDisplay();
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function saveToStorage() {
+        localStorage.setItem('yvi_vocab_final', JSON.stringify(vocabularies));
+    }
+
+    function saveVocab(event) {
+        event.preventDefault();
+        const editIndex = parseInt(document.getElementById('edit-index').value);
+        const category = document.getElementById('category').value;
+        const verbType = document.getElementById('verb-type').value;
+        
+        let rawJapanese = document.getElementById('japanese').value;
+        const japanese = parseFurigana(rawJapanese);
+
+        const german = document.getElementById('german').value;
+        const example = document.getElementById('example').value;
+
+        if (editIndex === -1) {
+            const cleanJap = japanese.replace(/<[^>]*>?/gm, '').trim().toLowerCase();
+            const cleanGer = german.trim().toLowerCase();
+
+            const existing = vocabularies.find(v => {
+                const vJap = v.japanese.replace(/<[^>]*>?/gm, '').trim().toLowerCase();
+                const vGer = v.german.trim().toLowerCase();
+                return vJap === cleanJap || vGer === cleanGer;
+            });
+
+            if (existing) {
+                const proceed = confirm(`Neko-Sensei schnuppert ein Duplikat! 🐾\nEntweder der Begriff "${japanese}" oder die Bedeutung "${german}" existiert bereits in deinem Lernbuch (Kategorie: ${existing.category}).\n\nMöchtest du ihn trotzdem noch einmal hinzufügen?`);
+                if (!proceed) return;
+            }
+
+            vocabularies.push({ category, japanese, german, example, verbType });
+            alert('Neko-Sensei hat es eingetragen! 🌸');
+        } else {
+            vocabularies[editIndex] = { category, japanese, german, example, verbType };
+            alert('Eintrag erfolgreich aktualisiert! ✨');
+            resetAddForm();
+        }
+
+        saveToStorage();
+        document.getElementById('vocab-form').reset();
+        switchTab('learn');
+    }
+
+    function editVocab(index) {
+        const item = vocabularies[index];
+        switchTab('add');
+
+        document.getElementById('category').value = item.category;
+        checkCategoryChange();
+        document.getElementById('verb-type').value = item.verbType || "u";
+        
+        let displayJapanese = item.japanese.replace(/<ruby>([^<]+)<rt>([^<]+)<\/rt><\/ruby>/g, '$1($2)');
+        document.getElementById('japanese').value = displayJapanese;
+        
+        document.getElementById('german').value = item.german;
+        document.getElementById('example').value = item.example || '';
+        document.getElementById('edit-index').value = index;
+
+        document.getElementById('form-submit-btn').innerText = "Änderungen speichern ✨";
+        document.getElementById('tab-add').innerText = "Bearbeiten ✏️";
+    }
+
+    function renderList() {
+        const container = document.getElementById('vocab-list-container');
+        container.innerHTML = '';
+
+        if (vocabularies.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#777;">Noch keine Einträge vorhanden.</p>';
+            return;
+        }
+
+        vocabularies.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'vocab-item';
+            div.innerHTML = `
+                <div>
+                    <strong>${item.japanese}</strong> ➔ ${item.german}
+                    <span style="font-size:0.8rem; color:#888;">(${item.category})</span>
+                </div>
+                <div class="vocab-actions">
+                    <button class="action-btn" onclick="editVocab(${index})" title="Bearbeiten">✏️</button>
+                    <button class="action-btn" onclick="deleteVocab(${index})" title="Löschen" style="color:#ff7675;">🗑️</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function deleteVocab(index) {
+        if (confirm("Möchtest du diesen Eintrag wirklich löschen?")) {
+            vocabularies.splice(index, 1);
+            saveStorageAndRunList();
+        }
+    }
+
+    function saveStorageAndRunList() {
+        saveToStorage();
+        renderList();
+    }
+
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vocabularies, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "japanisch_lern_backup.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+</script>
+
+</body>
+</html>
